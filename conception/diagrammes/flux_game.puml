@@ -1,0 +1,67 @@
+@startuml Worduel
+
+actor "Player 1" as P1
+actor "Player 2" as P2
+participant "Client" as C
+participant "Server" as S
+participant "Database" as DB
+
+== Player 1 starts the duel mode ==
+P1 -> C : Select "Duel Mode"
+C -> S : Send request for duel game
+S -> DB : Check for available game (player_in_game < max_players)
+
+alt No available game
+    S -> DB : Create a new game
+    DB -> S : New game created with player_in_game = 1
+    S -> C : Return game created, waiting for Player 2
+    C -> P1 : Display "Waiting for Player 2"
+else Game available
+    DB -> S : Found game with space (player_in_game = 1)
+    S -> C : Return game found, joining as Player 2
+end
+
+== Player 2 joins the game ==
+P2 -> C : Select "Duel Mode"
+C -> S : Send request to join game
+S -> DB : Find available game (player_in_game < max_players)
+
+alt Game found
+    DB -> S : Game found, updating player_in_game to 2
+    S -> DB : Update game to player_in_game = 2, start game
+    DB -> S : Game started
+    S -> C : Return game started, Player 2 joined
+    C -> P1 : Display "Game started"
+    C -> P2 : Display "Game started"
+else No game found
+    S -> C : No available game, show message
+    C -> P2 : Display "No game available"
+end
+
+== Game flow ==
+P1 -> C : Make guess
+C -> S : Submit guess
+S -> DB : Save guess in PlayerGameSession
+DB -> S : Update game state, return result
+S -> C : Return result to Player 1
+
+P2 -> C : Make guess
+C -> S : Submit guess
+S -> DB : Save guess in PlayerGameSession
+DB -> S : Update game state, return result
+S -> C : Return result to Player 2
+
+== Game ends ==
+S -> DB : Update game status to "completed"
+
+== Calculate Scores and Update MMR ==
+S -> DB : Fetch MMR for Player 1 and Player 2
+S -> S : Calculate scores using MMR-based formula
+S -> DB : Update total_score_multi for Player 1 and Player 2
+S -> DB : Update MMR for both players
+S -> C : Notify both players of game completion and scores
+
+C -> P1 : Display "Game over, final score and MMR updated"
+C -> P2 : Display "Game over, final score and MMR updated"
+
+@enduml

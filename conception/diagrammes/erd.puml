@@ -1,0 +1,95 @@
+@startuml Worduel
+
+' Définition des entités
+
+entity "User" as User {
+    * id
+    --
+    username
+    email
+    avatar
+    role
+    mmr
+    total_score_multi
+    primary_color_preference
+    secondary_color_preference
+    created_at
+    updated_at
+}
+
+entity "Authentication" as Authentication {
+    * id
+    --
+    user_id
+    type
+    identifier
+    password_hash
+    created_at
+    updated_at
+}
+
+entity "Word" as Word {
+    * id
+    --
+    word_text
+    created_at
+}
+
+entity "Game" as Game {
+    * id
+    --
+    creator_id
+    mode
+    word_id
+    status
+    max_players
+    player_in_game
+    started_at
+    ended_at
+    created_at
+    updated_at
+}
+
+entity "PlayerGameSession" as PlayerGameSession {
+    * id
+    --
+    game_id
+    user_id
+    score_by_time
+    score_by_guesses
+    score_bonus
+    succeeded
+    joined_at
+    mmr_change
+    guesses_count
+    status
+    updated_at
+}
+
+entity "Guess" as Guess {
+    * id
+    --
+    game_session_id
+    word_id
+    attempt_number
+    result
+    created_at
+}
+
+' Définition des relations avec cardinalités
+
+User "1" -- "1..N" Authentication
+
+User "1" -- "0..N" PlayerGameSession
+
+Game "1" -- "0..N" PlayerGameSession
+
+PlayerGameSession "1" -- "0..N" Guess
+
+User "1" -- "0..N" Game
+
+Word "1" -- "0..N" Game : Utilisé dans
+
+Word "1" -- "0..N" Guess : Utilisé dans la tentative
+
+@enduml

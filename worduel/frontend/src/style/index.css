@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@font-face {
+  font-family: 'Poppins';
+  font-weight: 100;
+  font-style: normal;
+  src: url('../assets/fonts/Poppins-Thin-100.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-weight: 300;
+  font-style: normal;
+  src: url('../assets/fonts/Poppins-Light-300.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-weight: 600;
+  font-style: normal;
+  src: url('../assets/fonts/Poppins-SemiBold-600.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-weight: 800;
+  font-style: normal;
+  src: url('../assets/fonts/Poppins-ExtraBold-800.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-weight: 900;
+  font-style: normal;
+  src: url('../assets/fonts/Poppins-Black-900.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-weight: 100 1000;
+  font-style: normal;
+  src: url('../assets/fonts/Roboto-flex.ttf') format('truetype');
+}
+
+@layer base {
+
+  :root {
+    --background: 229 50% 96%;
+    --foreground: 200 18% 26%;
+    --foregroundhover: 0 0% 70%;
+    --gridbackground : 229 19% 88%;
+    --keyboardbackground : 229 19% 88%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 192 82% 61%;
+    --primary-foreground: 0 0% 14%;
+    --secondary: 0 74% 65%;
+    --secondary-foreground: 0 0% 14%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 0 0% 14%;
+    --foreground: 229 50% 96%;
+    --foregroundhover: 0 0% 25%;
+    --gridbackground :0 0% 20%;
+    --keyboardbackground : 0 0% 25%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 192 82% 61%;
+    --primary-foreground: 229 50% 96;
+    --secondary:  0 74% 65%;
+    --secondary-foreground: 229 50% 96%;
+
+  }
+  
+  * {
+    @apply border-border;
+    @apply bg-background text-foreground;
+  }
+
+  body {
+    @apply font-roboto;
+    @apply bg-background text-foreground;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-poppins;
+    font-weight: 600;
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
+  
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  /* React-toastify style custom  */
+  .toastbase{
+    padding: 1em;
+    font-weight: 600;
+    margin-top: 2em;
+  }
+  
+}
+

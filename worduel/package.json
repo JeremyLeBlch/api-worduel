@@ -1,0 +1,14 @@
+{
+  "name": "worduel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docker:dev-start": "docker compose -f docker-compose.dev.yml up --build",
+    "docker:dev-stop": "docker compose -f docker-compose.dev.yml down -v"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

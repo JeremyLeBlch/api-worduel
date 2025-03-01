@@ -1,0 +1,75 @@
+@startuml
+
+skinparam componentStyle rectangle
+
+' Navigateur de l'utilisateur
+actor "Utilisateur" as user
+
+node "Navigateur de l'Utilisateur" {
+  component "Application React" <<BrowserApp>> as react_app
+}
+
+user --> react_app : Interaction
+
+' Serveur Hostinger
+node "Serveur Hostinger" as hostinger_server {
+  frame "Docker Host" {
+    [NGINX] <<Reverse Proxy>> as nginx
+    node "Conteneur Docker : Application Node.js" as nodejs_container {
+      component "Express Server" as express
+      component "Apollo Server" as apollo_server
+      component "Prisma ORM" as prisma
+      component "Module d'Authentification" as auth_module
+      component "Module d'Autorisation" as authz_module
+      component "GraphQL Subscriptions" as graphql_subs
+      component "Gestion des Logs (Morgan)" as morgan
+      component "Surveillance des Erreurs (Sentry)" as sentry_agent
+    }
+    node "Conteneur Docker : Redis" as redis
+    node "Conteneur Docker : PostgreSQL" as postgres
+  }
+}
+
+' Services Externes
+cloud "Services Externes" {
+  [Mailgun API] as mailgun
+  [Google OAuth 2.0] as google_oauth
+  [Let's Encrypt] as lets_encrypt
+  [Sentry Service] as sentry_service
+}
+
+' CI/CD
+node "Pipeline CI/CD" {
+  component "GitHub Actions" as github_actions
+}
+
+' Contrôle de Version
+node "Contrôle de Version" {
+  component "Dépôt GitHub" as github_repo
+}
+
+' Relations
+
+react_app --> nginx : Requêtes HTTPS
+nginx --> express : Proxy des Requêtes
+
+express --> apollo_server : Requêtes GraphQL
+apollo_server --> prisma : Opérations ORM
+prisma --> postgres : Requêtes SQL
+
+express --> redis : Sessions & Cache
+
+auth_module --> google_oauth : Authentification OAuth 2.0
+
+nodejs_container --> mailgun : Envoi d'Emails
+
+express --> morgan : Logs des Requêtes
+express --> sentry_agent : Envoi des Erreurs
+sentry_agent --> sentry_service : Surveillance des Erreurs
+
+nginx --> lets_encrypt : Certificats SSL/TLS
+
+github_repo --> github_actions : Déclenchement CI/CD
+github_actions --> hostinger_server : Déploiement
+
+@enduml

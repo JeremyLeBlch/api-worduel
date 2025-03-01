@@ -1,0 +1,95 @@
+@startuml Worduel
+
+' Définition des entités
+
+entity "User" as User {
+    * id : UUID PK
+    --
+    username : VARCHAR(50) UNIQUE NULLABLE
+    email : VARCHAR(255) UNIQUE NOT NULL
+    avatar : VARCHAR(255) DEFAULT 'default.png'
+    role : VARCHAR(20) DEFAULT 'user'
+    mmr : INTEGER DEFAULT 1000
+    total_score_multi : INTEGER DEFAULT 0
+    primary_color_preference : VARCHAR(20) DEFAULT  '#48CDED'
+    secondary_color_preference : VARCHAR(20) DEFAULT '#E86262'
+    created_at : TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP WITH TIME ZONE
+    updated_at : TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP WITH TIME ZONE
+}
+
+entity "Authentication" as Authentication {
+    * id : UUID PK
+    --
+    user_id : UUID FK
+    type : VARCHAR(20) NOT NULL
+    identifier : VARCHAR(255) NOT NULL
+    password_hash : VARCHAR(255) NULLABLE
+    created_at : TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP WITH TIME ZONE
+    updated_at : TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP WITH TIME ZONE
+}
+
+entity "Word" as Word {
+    * id : UUID PK
+    --
+    word_text : VARCHAR(50) UNIQUE NOT NULL
+    created_at : TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP WITH TIME ZONE
+}
+
+entity "Game" as Game {
+    * id : UUID PK
+    --
+    creator_id : UUID FK
+    mode : VARCHAR(10) NOT NULL -- 'solo' ou 'duel'
+    word_id : UUID FK
+    status : game_status NOT NULL
+    max_players : INTEGER DEFAULT 2
+    player_in_game: INTEGER DEFAULT 0
+    started_at : TIMESTAMPTZ
+    ended_at : TIMESTAMPTZ
+    created_at : TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP WITH TIME ZONE
+    updated_at : TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP WITH TIME ZONE
+}
+
+entity "PlayerGameSession" as PlayerGameSession {
+    * id : UUID PK
+    --
+    game_id : UUID FK
+    user_id : UUID FK
+    score_by_time : INTEGER DEFAULT 0
+    score_by_guesses : INTEGER DEFAULT 0
+    score_bonus : INTEGER DEFAULT 0
+    succeeded : game_result DEFAULT 'in_progress'
+    mmr_change : INTEGER DEFAULT 0
+    joined_at : TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP WITH TIME ZONE
+    guesses_count : INTEGER DEFAULT 0
+    status : VARCHAR(20) DEFAULT 'actif'
+    updated_at : TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP WITH TIME ZONE
+}
+
+entity "Guess" as Guess {
+    * id : UUID PK
+    --
+    game_session_id : UUID FK
+    word_id : UUID FK
+    attempt_number : INTEGER NOT NULL
+    result : JSONB
+    created_at : TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP WITH TIME ZONE
+}
+
+' Définition des relations avec cardinalités
+
+User "1" -- "1..N" Authentication : possède
+
+User "1" -- "0..N" PlayerGameSession : participe à
+
+Game "1" -- "0..N" PlayerGameSession : a pour joueurs
+
+PlayerGameSession "1" -- "0..N" Guess : effectue
+
+User "1" -- "0..N" Game : crée
+
+Word "1" -- "0..N" Game : est utilisé dans
+
+Word "1" -- "0..N" Guess : Utilisé dans la tentative
+
+@enduml

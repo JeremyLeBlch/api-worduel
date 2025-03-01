@@ -1,0 +1,14 @@
+.idea/
+node_modules/
+.env
+dist/
+build/
+perso/
+certbot/
+docker-compose.yml
+nginx.conf.prod
+vite.config.ts
+worduel/frontend/tsconfig.app.tsbuildinfo
+worduel/frontend/tsconfig.node.tsbuildinfo
+worduel/api/.DS_Store
+.DS_Store

@@ -1,0 +1,39 @@
+@startuml Sequence Diagram Soloplayer
+
+' Diagramme de séquence pour une partie de Worduel
+
+actor Player
+participant GameServer
+participant WordList
+participant Scoreboard
+
+Player -> GameServer: startGame()
+activate GameServer
+GameServer -> WordList: getRandomWord()
+activate WordList
+WordList -> GameServer: randomWord
+GameServer -> Player: displayWordGrid()
+deactivate WordList
+
+loop max 6 times
+  Player -> GameServer: submitGuess(word)
+  activate GameServer
+  GameServer -> WordList: validateGuess(word)
+  activate WordList
+  WordList -> GameServer: validationResult
+  deactivate WordList
+  GameServer -> Player: displayFeedback(validationResult)
+  alt correct word
+    GameServer -> Scoreboard: updateScore(Player)
+    deactivate GameServer
+    GameServer -> Player: endGame(success)
+    deactivate Scoreboard
+    break
+  end
+  deactivate GameServer
+end
+
+GameServer -> Player: endGame(failure)
+deactivate GameServer
+
+@enduml

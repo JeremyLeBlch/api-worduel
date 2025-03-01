@@ -1,0 +1,57 @@
+@startuml Worduel
+
+title Worduel Deployment Diagram (Multiplayer)
+
+node "VPS (Ubuntu 24 LTS)" {
+    node "Docker" {
+        node "Nginx Reverse Proxy" as nginx {
+            [Nginx] --> [Frontend (Vite)]
+            [Nginx] --> [API (Apollo Server)]
+            [Nginx] --> [Adminer]
+        }
+
+        node "Frontend (React + Vite)" as frontend {
+            [React + Vite] --> [Browser]
+        }
+
+        node "API (Apollo Server + Socket.io)" as api {
+            [Apollo Server] --> db
+            [Apollo Server] --> redis
+            [Apollo Server] --> websocket
+        }
+
+        node "WebSocket Server" as websocket {
+            [WebSocket (Socket.io)] --> [Players]
+        }
+
+        node "Adminer" as adminer {
+            [Adminer] --> db
+        }
+
+        node "PostgreSQL" as db {
+            [Database]
+        }
+
+        node "Redis" as redis {
+            [Cache]
+        }
+
+        node "Monitoring (Prometheus + Grafana)" as monitoring {
+            [Prometheus] --> nginx
+            [Prometheus] --> api
+            [Prometheus] --> db
+            [Prometheus] --> redis
+        }
+    }
+}
+
+cloud "Internet" {
+    [DNS: worduel.fr] --> nginx
+}
+
+node "Test de charge (Artillery)" as load_test {
+    [Artillery] --> websocket
+    [Artillery] --> api
+}
+
+@enduml

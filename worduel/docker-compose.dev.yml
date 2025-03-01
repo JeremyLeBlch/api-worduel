@@ -1,0 +1,85 @@
+version: "3.8"
+services:
+    nginx:
+        build:
+            context: ./nginx
+        container_name: nginx_reverse_proxy
+        ports:
+            - "80:80"
+        depends_on:
+            - frontend
+            - api
+            - adminer
+        networks:
+            - worduel_net
+        volumes:
+            - ./nginx/nginx.conf.dev:/etc/nginx/nginx.conf
+    frontend:
+        container_name: worduel-frontend
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        ports:
+            - "5173:5173"
+        volumes:
+            - ./frontend:/app
+            - /app/node_modules
+        env_file:
+            - .env
+        environment:
+            NODE_ENV: development
+            VITE_API_URL_DEV: ${VITE_API_URL_DEV}
+        restart: always
+        networks:
+            - worduel_net
+    api:
+        build:
+            context: ./api
+        container_name: worduel-api
+        ports:
+            - "4000:4000"
+            - "5555:5555"
+        restart: on-failure
+        depends_on:
+            - postgres
+            - redis
+        volumes:
+            - ./api:/usr/src/api
+            - /usr/src/api/node_modules
+        env_file:
+            - ./api/.env
+        environment:
+            NODE_ENV: development
+        networks:
+            - worduel_net
+    adminer:
+        image: adminer
+        container_name: worduel-adminer
+        expose:
+            - "8080"
+        depends_on:
+            - postgres
+        networks:
+            - worduel_net
+    postgres:
+        image: postgres:13
+        container_name: postgres
+        env_file:
+            - .env
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        volumes:
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+            - ./mots_5_lettres.csv:/docker-entrypoint-initdb.d/mots_5_lettres.csv
+        networks:
+            - worduel_net
+    redis:
+        image: redis:6.2
+        container_name: redis
+        networks:
+            - worduel_net
+networks:
+    worduel_net:
+        driver: bridge

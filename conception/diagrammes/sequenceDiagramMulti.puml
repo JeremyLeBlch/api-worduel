@@ -1,0 +1,114 @@
+@startuml Sequence Diagram Multiplayer with Matchmaking
+
+' Diagramme de séquence pour une partie multijoueur de Worduel avec matchmaking amélioré
+
+actor Player1
+actor Player2
+participant GameServer
+participant GameMatchmaking
+participant WordList
+participant Timer
+participant Scoreboard
+
+
+Player1 -> GameServer: requestGame()
+activate GameServer
+GameServer -> GameMatchmaking: findExistingGame()
+activate GameMatchmaking
+alt game exists (true)
+  GameMatchmaking -> GameServer: return true
+  GameServer -> Player1: joinGame()
+  deactivate GameMatchmaking
+else no game (false)
+  GameMatchmaking -> GameServer: return false
+  GameServer -> Player1: createNewGame()
+  GameServer -> Player1: displayWaitingForOpponent()
+  deactivate GameMatchmaking
+end
+
+Player2 -> GameServer: requestGame()
+activate GameServer
+GameServer -> GameMatchmaking: findExistingGame()
+activate GameMatchmaking
+alt game exists (true)
+  GameMatchmaking -> GameServer: return true
+  GameServer -> Player2: joinGame()
+  GameServer -> Player1: notifyOpponentJoined()
+  deactivate GameMatchmaking
+  GameServer -> WordList: getRandomWord()
+  activate WordList
+  WordList -> GameServer: randomWord
+  GameServer -> Player1: displayWordGrid()
+  GameServer -> Player2: displayWordGrid()
+  deactivate WordList
+else no game (false)
+  GameMatchmaking -> GameServer: return false
+  GameServer -> Player2: createNewGame()
+  GameServer -> Player2: displayWaitingForOpponent()
+  deactivate GameMatchmaking
+end
+
+GameServer -> Timer: startTimer()
+
+par Player1 and Player2 play simultaneously
+    Player1 -> GameServer: submitGuess(word)
+    activate GameServer
+    GameServer -> WordList: validateGuess(word)
+    activate WordList
+    WordList -> GameServer: validationResult
+    deactivate WordList
+    GameServer -> Player1: displayFeedback(validationResult)
+    alt correct word
+      GameServer -> Player1: endGame(success)
+      GameServer -> Player2: endGame(failure)
+      GameServer -> Scoreboard: updateScore(Player1, Player2)
+      deactivate GameServer
+      break
+    end
+    deactivate GameServer
+
+    Player2 -> GameServer: submitGuess(word)
+    activate GameServer
+    GameServer -> WordList: validateGuess(word)
+    activate WordList
+    WordList -> GameServer: validationResult
+    deactivate WordList
+    GameServer -> Player2: displayFeedback(validationResult)
+    alt correct word
+      GameServer -> Player2: endGame(success)
+      GameServer -> Player1: endGame(failure)
+      GameServer -> Scoreboard: updateScore(Player1, Player2)
+      deactivate GameServer
+      break
+    end
+    deactivate GameServer
+end
+
+alt maxAttemptsReached
+  GameServer -> Player1: endGame(draw)
+  GameServer -> Player2: endGame(draw)
+  GameServer -> Scoreboard: updateScore(Player1, Player2)
+  deactivate GameServer
+end
+
+alt playerDisconnected
+  GameServer -> Player1: checkConnection()
+  alt Player1 disconnected
+    GameServer -> Player2: endGame(success)
+    GameServer -> Player1: endGame(failure)
+    GameServer -> Scoreboard: updateScore(Player1, Player2)
+  else Player2 disconnected
+    GameServer -> Player1: endGame(success)
+    GameServer -> Player2: endGame(failure)
+    GameServer -> Scoreboard: updateScore(Player1, Player2)
+  end
+end
+
+alt timeOut
+  Timer -> GameServer: timeElapsed()
+  GameServer -> Player1: endGame(draw)
+  GameServer -> Player2: endGame(draw)
+  GameServer -> Scoreboard: updateScore(Player1, Player2)
+end
+
+@enduml

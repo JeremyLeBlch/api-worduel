@@ -1,0 +1,58 @@
+@startuml Wordle
+start
+:Inscription / Connexion;
+if (Est connecté ?) then (Oui)
+  :Sélection du mode;
+  if (Solo ou Multijoueur ?) then (Solo)
+    :Débuter une partie solo;
+    :Sélectionner un mot aléatoire;
+    :Afficher la grille de mots;
+    repeat 
+      :Soumettre un mot;
+      :Valider le mot;
+      :Afficher feedback (lettres correctes, emplacement);
+    repeat while (Mot correct ou 6 essais épuisés ?)
+    if (Mot correct ?) then (Oui)
+      :Fin de la partie (victoire);
+    else (Non)
+      :Fin de la partie (échec);
+    endif
+    :Proposer Rejouer / Quitter;
+  else (Multijoueur)
+    :Trouver un adversaire;
+    :Débuter une partie Multijoueur;
+    fork
+      :Chronomètre partagé (60s);
+    fork again
+      :Joueur 1 soumet un mot;
+      :Valider le mot pour J1;
+      :Afficher feedback J1;
+    fork again
+      :Joueur 2 soumet un mot;
+      :Valider le mot pour J2;
+      :Afficher feedback J2;
+    end fork
+    :Mise à jour de l'état des deux joueurs (Lettres correctes sans les dévoiler);
+
+    if (Adversaire déconnecté ?) then (Oui)
+      :Afficher pop-up "Adversaire déconnecté, victoire !";
+      :Fin de la partie;
+      :Proposer Revanche / Quitter;
+    else (Non)
+      if (Joueur trouve le mot ?) then (Oui)
+        :Fin de partie pour J1/J2;
+        :Déclaration du gagnant;
+        :Proposer Revanche / Quitter;
+      else (Non)
+        if (Chronomètre écoulé ?) then (Oui)
+          :Fin de la partie, aucun gagnant;
+          :Proposer Revanche / Quitter;
+        endif
+      endif
+    endif
+  endif
+else (Non)
+  :Rediriger vers la page de connexion;
+endif
+stop
+@enduml

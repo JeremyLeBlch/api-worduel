@@ -1,0 +1,26 @@
+.loader {
+    border-right: 0.8em solid hsl(var(--primary));
+    border-left: 0.8em solid hsl(var(--secondary));
+    border-radius: 50%;
+    margin: 1em auto;
+    border-top: 0.8em solid hsl(var(--secondary));
+    border-bottom: 0.8em solid hsl(var(--primary));
+    width: 0.5em;
+    height: 0.5em;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+        animation-timing-function: ease-in;
+    }
+    50% {
+        transform: rotate(180deg);
+        animation-timing-function: ease-out;
+    }
+    100% {
+        transform: rotate(360deg);
+        animation-timing-function: ease-in;
+    }
+}

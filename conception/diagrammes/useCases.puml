@@ -1,0 +1,30 @@
+@startuml Wordle
+left to right direction
+actor Joueur as J
+actor Admin as A <<optional>>
+
+package "Version 1.0 - MVP" {
+  J --> (S'inscrire) : "S'inscrire"
+  J --> (Se connecter) : "Se connecter"
+  J --> (Supprimer compte) : "Supprimer"
+  J --> (Modifier compte) : "Modifier"
+  J --> (Jouer en solo) : "Jouer en solo"
+  J --> (Jouer en multijoueur) : "Jouer en multijoueur"
+}
+
+package "Version 2.0 - Personnalisation et Classement" {
+  J --> (Personnaliser avatar) : "Personnaliser avatar"
+  J --> (Voir classement) : "Voir classement"
+  J --> (Consulter statistiques) : "Consulter statistiques"
+}
+
+package "Version 3.0 - Notifications et Récompenses" {
+  J --> (Recevoir notifications) : "Recevoir notifications"
+  J --> (Accéder aux récompenses) : "Accéder aux récompenses"
+}
+
+A --> (Gérer les utilisateurs)
+A --> (Gérer le jeu)
+A --> (Gérer le leaderboard)
+
+@enduml
